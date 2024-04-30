@@ -1,0 +1,32 @@
+<.header>
+  Plot <%= @plot.id %>
+  <:subtitle>This is a plot record from your database.</:subtitle>
+  <:actions>
+    <.link
+      :if={@current_user.id == @plot.created_by_id}
+      patch={~p"/plots/#{@plot}/show/edit"}
+      phx-click={JS.push_focus()}
+    >
+      <.button>Edit plot</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<div id="plotly-chart" phx-hook="plotly" data-values={@values}></div>
+
+<.back :if={@plot.created_by_id == @current_user.id} navigate={~p"/plots"}>Back to plots</.back>
+<.back :if={@plot.created_by_id != @current_user.id} navigate={~p"/plots/shared"}>
+  Back to plots
+</.back>
+
+<.modal :if={@live_action == :edit} id="plot-modal" show on_cancel={JS.patch(~p"/plots/#{@plot}")}>
+  <.live_component
+    module={PlotTestWeb.PlotLive.FormComponent}
+    id={@plot.id}
+    title={@page_title}
+    action={@live_action}
+    plot={@plot}
+    patch={~p"/plots/#{@plot}"}
+    current_user={@current_user}
+  />
+</.modal>
